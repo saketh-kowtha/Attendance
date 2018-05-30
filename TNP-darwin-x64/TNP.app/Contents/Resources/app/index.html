@@ -1,0 +1,125 @@
+<html>
+    <head>
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+
+        <!-- jQuery library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+        <!-- Popper JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+
+        <!-- Latest compiled JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+       
+       
+       <style>
+            .footer{
+                position: absolute;
+                bottom: 0.5%;
+                text-align: center;
+                margin-left: auto;
+                margin-right: auto;
+                left: 0;
+                right: 0;      
+                color: #A9A9A9;
+                width: 100%;
+                padding-top : 10px; 
+                background-color: black;     
+            }
+            .jumbotron{
+                max-height: 100px;
+                text-align: center;
+            }
+            .main{
+                text-align: center;
+            }
+            #res{
+                max-height: 400px;
+                overflow-x: scroll;
+            }
+            .present{
+                color: green;
+            }
+            .absent{
+                color: red;
+            }
+        </style>
+        <script>
+     
+            var back = require("./main.js")
+            window.$ = window.jQuery = require('./jquery.min.js');
+            function selection(){
+                try{
+                    let file = document.getElementById("file").files[0].path
+                    let productArray = back.getSheetNames(file)                
+                    let optionsAsString = "";
+                    for(let i = 0; i < productArray.length; i++) {
+                        optionsAsString += "<option value='" + productArray[i] + "'>" + productArray[i] + "</option>";
+                    }
+                    $('select[id="select"]').append( optionsAsString );
+                }
+                catch(e){
+                    alert("o")
+                    return
+                }
+            }
+           
+            function display(){
+                let mnth ={"01":"January","02":"February","03":"March","04":"April","05":"May","06":"June","07":"July","08":"August","09":"September","10":"October","11":"November","12":"December"}
+                let name = document.getElementById("select").value
+                if(!name){
+                    alert("Please select Sheet name")
+                    return
+                }
+                back.setSheetName(name)
+                let roll = document.getElementById("rollNumber").value
+                roll = roll.toUpperCase()
+                if(roll.length != 10){
+                    alert("Invalid Rollnumber")
+                    return
+                }
+                let resp = back.mainexe(roll)
+                if(resp == "NA")
+                {
+                    $("#res").html("<h4>No Record Found</h4>")    
+                    return                
+                }
+                let wrking = resp.Attendence.workingDays
+                let att = resp.Attendence
+                let markup ="<h4>"+ resp.name +"</h4><h5>" + resp.roll + "</h5>"
+                for(let x in wrking){
+                    markup += "<h4><u>" + mnth[x] + "</u></h4>"
+                    markup += "<label class = 'working'>Number of working Days : " + wrking[x] + "</label><br>"
+                    markup += "<label class = 'present'>Number of Days Present : " + att[x] + "</label><br>"
+                    markup += "<label class = 'absent'>Number of Days Absent : " + (parseInt(wrking[x]) - parseInt(att[x])) + "</label><br>"
+                    markup += "<br>"
+                }
+                $("#res").html(markup)
+            }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <div class = "jumbotron">
+                <h3>NRI Institute of Technology</h3>
+            </div>
+            <div class = "main">
+                <div id="fileselection">
+                     Choose Your File Name : <input type="file" id = "file" /><br><br><button class="btn btn-info" onclick="selection()">Get</button><br>
+                    <label>Select Sheetname</label> &nbsp;<select id="select"></select>
+                </div>
+                <div class="result">
+                    <input type="text" id ="rollNumber" placeholder="Enter Rollnumber"/> &nbsp;<button class="btn btn-info" onclick="display()">Go!</button><br><br>
+                    <div id="res">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class = "footer container">
+            <p>Developed by Kowtha Saketh <br> +91 7207270470 | www.kowthasaketh.com | k.sakeths2010@gmail.com</p>
+        </div>
+
+    </body>
+</html>
